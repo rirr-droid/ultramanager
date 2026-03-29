@@ -1,0 +1,71 @@
+name: iOS Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build iOS App
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Xcode
+      uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: '15.0'
+
+    - name: Create Xcode Project
+      run: |
+        # This is a placeholder - we need a proper Xcode project
+        echo "⚠️ IMPORTANT: This workflow needs a proper .xcodeproj file"
+        echo "The current project.pbxproj is a placeholder"
+        echo ""
+        echo "To fix this:"
+        echo "1. Create Xcode project on a Mac"
+        echo "2. Import all Swift files"
+        echo "3. Commit the real .xcodeproj to GitHub"
+        echo ""
+        echo "For now, this workflow documents what's needed."
+        exit 1
+
+    - name: Build for iOS Simulator
+      if: false  # Disabled until we have proper project
+      run: |
+        xcodebuild -scheme UltraManager \
+          -sdk iphonesimulator \
+          -destination 'platform=iOS Simulator,name=iPhone 15 Pro' \
+          build
+
+    - name: Archive for TestFlight
+      if: false  # Disabled until we have proper project
+      run: |
+        xcodebuild -scheme UltraManager \
+          -sdk iphoneos \
+          -configuration Release \
+          -archivePath $PWD/build/UltraManager.xcarchive \
+          archive
+
+    - name: Export IPA
+      if: false  # Disabled until we have proper project
+      run: |
+        xcodebuild -exportArchive \
+          -archivePath $PWD/build/UltraManager.xcarchive \
+          -exportOptionsPlist ExportOptions.plist \
+          -exportPath $PWD/build
+
+    - name: Upload to TestFlight
+      if: false  # Disabled until we have proper project
+      env:
+        APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+      run: |
+        xcrun altool --upload-app \
+          --type ios \
+          --file build/UltraManager.ipa \
+          --apiKey $APP_STORE_CONNECT_API_KEY
